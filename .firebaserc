@@ -1,0 +1,14 @@
+{
+  "projects": {
+    "default": "doit-f1af8"
+  },
+  "targets": {
+    "doit-f1af8": {
+      "hosting": {
+        "dotasks": [
+          "dotasks"
+        ]
+      }
+    }
+  }
+}
