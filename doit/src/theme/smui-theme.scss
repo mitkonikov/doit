@@ -5,13 +5,15 @@ $mdc-typography-font-family: unquote("Roboto, sans-serif");
 // But also, I'm planning to make a file for a light theme
 
 body {
-    background-color: #44aed8;
-    color: #fff;
+    background-color: #0d1f29;
+    color: rgb(240, 240, 240);
 }
 
-$mdc-theme-primary: #44aed8;
+$mdc-theme-primary: #0d1f29;
 // $mdc-theme-secondary: #eec81e;
-$mdc-theme-secondary: #c72e19;
+$mdc-theme-secondary: #ebbc00;
+$checked-color: #00eb5a;
+$unchecked-color: #1b3f53;
 
 $mdc-theme-background: #004750;
 $mdc-theme-surface: #004750;

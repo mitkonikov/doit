@@ -25,8 +25,11 @@
     "@tsconfig/svelte": "^1.0.0"
   },
   "dependencies": {
+    "firebase": "^8.3.1",
     "node-sass": "^5.0.0",
     "rollup-plugin-postcss": "^4.0.0",
+    "rxfire": "^4.0.0",
+    "rxjs": "^6.6.6",
     "sirv-cli": "^1.0.0",
     "svelte-material-icons": "^1.0.3",
     "svelte-material-ui": "^2.0.0-beta.0"
