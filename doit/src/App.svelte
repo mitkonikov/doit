@@ -4,19 +4,14 @@
     import { collectionData } from 'rxfire/firestore';
     import { startWith } from 'rxjs/operators';
 	import { db } from './ts/firebase';
+	import type { Observable } from 'rxjs';
 
 	import Calendar from './components/Calendar.svelte';
 	import AddCalendar from './components/AddCalendar.svelte';
-
-	interface User {
-		username: string;
-		firstname: string;
-		lastname: string;
-		calendars: [string];
-	}
+	import type { User } from './ts/types';
 
 	const query = db.collection('users').limit(1);
-	const users = collectionData(query).pipe(startWith([]));
+	const users = collectionData(query).pipe(startWith([])) as Observable<User[]>;
 </script>
 
 <main>

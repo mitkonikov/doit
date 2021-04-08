@@ -1,35 +1,53 @@
 <script lang="ts">
 	import { db } from './../ts/firebase';
 
-    export let cid: unknown;
+    export let cid: { id: string };
 
-    let calendarData;
-
-    const calendarQuery = db.collection('calendars').doc((cid as any).id).get();
-	calendarQuery.then((result) => {
-		calendarData = result.data();
-	});
-
-    let array = [];
-
-    for (let i = 0; i < 100; i++) {
-        if (Math.ceil(Math.random() * 10) % 2 == 0) {
-            array.push(false);
-        } else {
-            array.push(true);
+    let calendarData: {
+        data: number[];
+        name: string;
+        start_date: {
+            nanoseconds: number;
+            seconds: number;
         }
-    }
+    };
+
+    let days = [];
+    let loaded = false;
+
+    const calendarQuery = db.collection('calendars').doc(cid.id).get();
+	calendarQuery.then((result) => {
+		calendarData = result.data() as any;
+        console.log(calendarData);
+
+        // Decode the data from the db
+        for (let month = 0; month < calendarData.data.length; month++) {
+            for (let day = 0; day < 30; day++) {
+                days.push(calendarData.data[month] & 1);
+                calendarData.data[month] = calendarData.data[month] >> 1;
+            }
+        }
+        
+        loaded = true;
+        console.log(days);
+	});
 </script>
 
 <main>
-    <div class="calendar-main">
-        {#if typeof calendarData != "undefined"}
-            {calendarData.name}
-        {/if}
-        <div class="calendar-checkboxes">
-            {#each array as a, i}
-                <div class="calendar-day {a ? "checked" : ""}"></div>
-            {/each}
+    <div class="center-vh">
+        <div class="calendar-main">
+            {#if typeof calendarData != "undefined"}
+                {calendarData.name}
+            {/if}
+            <div class="calendar-checkboxes">
+                {#if !loaded}
+                    Loading...
+                {:else}
+                    {#each days as day, i}
+                        <div class="calendar-day {day ? "checked" : ""}"></div>
+                    {/each}
+                {/if}
+            </div>
         </div>
     </div>
 </main>
