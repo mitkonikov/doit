@@ -1,36 +1,31 @@
 <script lang="ts">
+    import type { Calendar } from '../ts/types';
 	import { db } from './../ts/firebase';
 
-    export let cid: { id: string };
+    export let calendarId: string;
 
-    let calendarData: {
-        data: number[];
-        name: string;
-        start_date: {
-            nanoseconds: number;
-            seconds: number;
-        }
-    };
-
+    let calendarData: Calendar;
     let days = [];
     let loaded = false;
 
-    const calendarQuery = db.collection('calendars').doc(cid.id).get();
-	calendarQuery.then((result) => {
-		calendarData = result.data() as any;
-        console.log(calendarData);
+    if (calendarId) {
+        const calendarQuery = db.collection('calendars').doc(calendarId).get();
+        calendarQuery.then((result) => {
+            calendarData = result.data() as any;
+            console.log(calendarData);
 
-        // Decode the data from the db
-        for (let month = 0; month < calendarData.data.length; month++) {
-            for (let day = 0; day < 30; day++) {
-                days.push(calendarData.data[month] & 1);
-                calendarData.data[month] = calendarData.data[month] >> 1;
+            // Decode the data from the db
+            for (let month = 0; month < calendarData.data.length; month++) {
+                for (let day = 0; day < 30; day++) {
+                    days.push(calendarData.data[month] & 1);
+                    calendarData.data[month] = calendarData.data[month] >> 1;
+                }
             }
-        }
-        
-        loaded = true;
-        console.log(days);
-	});
+            
+            loaded = true;
+            console.log(days);
+        });
+    }
 </script>
 
 <main>
