@@ -16,22 +16,24 @@
 
 	let user: firebase.User;
 	let userData: User;
-	const unsubscribe = authState(auth).subscribe(u => {
+	const unsubscribe = authState(auth).subscribe(async u => {
 		user = u;
 		if (user) {
 			// const query = db.collection('calendars').where('uid', '==', user.uid);
 			// const calendars = collectionData(query).pipe(startWith([]));
 			// console.log(calendars);
 			const account = {
-				uid: user.uid,
-				calendars: []
+				uid: user.uid
 			};
 
-			db.collection('users').doc(user.uid).set(account, {
+			await db.collection('users').doc(user.uid).set(account, {
 				merge: true
-			});
+			})
 
-			userData = account;
+			db.collection('users').doc(user.uid).get().then((document) => {
+				userData = document.data() as any;
+				console.log(userData);
+			});
 		}
 	});
 
@@ -48,11 +50,13 @@
 			<div class="special-btn" on:click={ () => auth.signOut() }>Logout</div>
 			
 			<div class="calendars">
-				{#each userData.calendars as calendarId}
-					<Calendar {calendarId}></Calendar>
-				{/each}
+				{#if userData}
+					{#each userData.calendars as calendarId}
+						<Calendar {calendarId}></Calendar>
+					{/each}
+				{/if}
 		
-				<AddCalendar/>
+				<AddCalendar uid={user.uid}/>
 			</div>
 		</div>
 	{:else}
@@ -61,7 +65,7 @@
 				DoIt!
 			</div>
 			<Login click={login} />
-			<span class="version">0.0.001</span>
+			<span class="version">0.0.003</span>
 		</div>
 	{/if}
 
