@@ -1,7 +1,9 @@
 <script lang="ts">
+    import firebase from 'firebase/app';
     import type { Calendar } from '../ts/types';
 	import { db } from './../ts/firebase';
 
+    export let userId: string;
     export let calendarId: string;
 
     let calendarData: Calendar;
@@ -12,7 +14,6 @@
         const calendarQuery = db.collection('calendars').doc(calendarId).get();
         calendarQuery.then((result) => {
             calendarData = result.data() as any;
-            console.log(calendarData);
 
             // Decode the data from the db
             for (let month = 0; month < calendarData.data.length; month++) {
@@ -26,6 +27,13 @@
             console.log(days);
         });
     }
+
+    function deleteCalendar() {
+        db.collection('calendars').doc(calendarId).delete();
+        db.collection('users').doc(userId).update({
+            calendars: firebase.firestore.FieldValue.arrayRemove(calendarId)
+        });
+    }
 </script>
 
 <main>
@@ -33,6 +41,7 @@
         <div class="calendar-main">
             {#if typeof calendarData != "undefined"}
                 {calendarData.name}
+                <span class="delete-btn" on:click={deleteCalendar}>Delete</span>
             {/if}
             <div class="calendar-checkboxes">
                 {#if !loaded}
@@ -83,5 +92,13 @@
         &:hover {
             background-color: darken($unchecked-color, 10%);
         }
+    }
+
+    .delete-btn {
+        cursor: pointer;
+        font-weight: 300;
+        right: 1em;
+        float: right;
+        font-size: 0.8em;
     }
 </style>

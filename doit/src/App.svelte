@@ -1,10 +1,7 @@
 <script lang="ts">
 	import './theme/common.scss';
 
-    import { collectionData } from 'rxfire/firestore';
-    import { startWith } from 'rxjs/operators';
 	import { auth, db, googleProvider } from './ts/firebase';
-	import type { Observable } from 'rxjs';
     import { authState } from 'rxfire/auth';
 
 	import Calendar from './components/Calendar.svelte';
@@ -16,24 +13,34 @@
 
 	let user: firebase.User;
 	let userData: User;
+	let unsubUserObserver: Function;
 	const unsubscribe = authState(auth).subscribe(async u => {
 		user = u;
 		if (user) {
-			// const query = db.collection('calendars').where('uid', '==', user.uid);
-			// const calendars = collectionData(query).pipe(startWith([]));
-			// console.log(calendars);
-			const account = {
-				uid: user.uid
-			};
+			// check if user data in Firestore exists
+			const userExists = await db.collection('users').doc(user.uid).get();
+			if (!userExists.exists) {
+				// If there's no previous user data, create it
+				const account = {
+					uid: user.uid
+				};
+				
+				await db.collection('users').doc(user.uid).set(account, {
+					merge: true
+				});
 
-			await db.collection('users').doc(user.uid).set(account, {
-				merge: true
-			})
+				db.collection('users').doc(user.uid).get().then((document) => {
+					userData = document.data() as any;
+				});
+			} else {
+				userData = userExists.data() as any;
+			}
 
-			db.collection('users').doc(user.uid).get().then((document) => {
-				userData = document.data() as any;
-				console.log(userData);
-			});
+			if (typeof unsubUserObserver == "undefined") {
+				// Subscribe to the user document
+				const userQuery = db.collection('users').doc(user.uid);
+				unsubUserObserver = userQuery.onSnapshot(docSnapshot => userData = docSnapshot.data() as any);
+			}
 		}
 	});
 
@@ -41,18 +48,22 @@
 		auth.signInWithPopup(googleProvider);
 	}
 
+	function logout() {
+		unsubUserObserver();
+		auth.signOut();
+	}
 </script>
 
 <main>
 	{#if user}
 		<div class="center-vh">
-			<Profile {...user}></Profile>
-			<div class="special-btn" on:click={ () => auth.signOut() }>Logout</div>
+			<Profile {user}></Profile>
+			<div class="special-btn" on:click={logout}>Logout</div>
 			
 			<div class="calendars">
 				{#if userData}
 					{#each userData.calendars as calendarId}
-						<Calendar {calendarId}></Calendar>
+						<Calendar userId={user.uid} {calendarId}></Calendar>
 					{/each}
 				{/if}
 		
@@ -61,11 +72,19 @@
 		</div>
 	{:else}
 		<div class="center-vh">
-			<div class="main-logo">
-				DoIt!
+			<div class="auth-container center-vh-flex">
+				<div style="position: relative">
+					<span class="main-logo noselect">
+						DoIt!
+					</span>
+					<span class="alpha-tag noselect">ALPHA</span>
+				</div>
+				<div class="intro noselect">
+					DoIt is a Web Application which allows you to track your everyday progress on one task and fill up a calendar doing regular small tasks each day.
+				</div>
+				<Login click={login} />
+				<span class="version noselect">0.0.006</span>
 			</div>
-			<Login click={login} />
-			<span class="version">0.0.003</span>
 		</div>
 	{/if}
 
@@ -88,10 +107,29 @@
         }
 	}
 
+	.auth-container {
+		width: clamp(10em, 100%, 20em);
+	}
+
 	.main-logo {
 		color: $mdc-theme-secondary;
 		font-size: 4em;
 		font-weight: 700;
+	}
+
+	.alpha-tag {
+		font-size: 1.1em;
+		color: $checked-color;
+		position: absolute;
+		top: 0;
+		margin-left: 0.3em;
+	}
+
+	.intro {
+		text-align: justify;
+		font-weight: 300;
+		padding: 1em 1.5em;
+		width: 100%;
 	}
 
 	.version {
