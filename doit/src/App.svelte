@@ -57,8 +57,7 @@
 <main>
 	{#if user}
 		<div class="center-vh">
-			<Profile {user}></Profile>
-			<div class="special-btn" on:click={logout}>Logout</div>
+			<Profile {user} {logout}></Profile>
 			
 			<div class="calendars">
 				{#if userData}
@@ -83,7 +82,7 @@
 					DoIt is a Web Application which allows you to track your everyday progress on one task and fill up a calendar doing regular small tasks each day.
 				</div>
 				<Login click={login} />
-				<span class="version noselect">0.0.006</span>
+				<span class="version noselect">0.0.007</span>
 			</div>
 		</div>
 	{/if}
