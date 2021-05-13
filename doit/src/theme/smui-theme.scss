@@ -114,6 +114,16 @@ $mdc-shape-large-component-radius: 0;
     height: 3.5em;
 }
 
+.mdc-icon-button.medium svg {
+    width: 1.5em;
+    height: 1.5em;
+
+    top: 50%;
+    left: 50%;
+    position: absolute;
+    transform: translate(-50%, -50%);
+}
+
 .mdc-icon-button.large svg {
     width: 2.2em;
     height: 2.2em;
@@ -122,4 +132,15 @@ $mdc-shape-large-component-radius: 0;
     left: 50%;
     position: absolute;
     transform: translate(-50%, -50%);
+}
+
+// SMUI Version 4 Bugs
+button .material-icons {
+    background: none;
+	color: inherit;
+	border: none;
+	padding: 0;
+	font: inherit;
+	cursor: pointer;
+	outline: inherit;
 }

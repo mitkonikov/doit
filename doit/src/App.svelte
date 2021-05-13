@@ -59,19 +59,21 @@
 		<div class="center-vh">
 			<Profile {user} {logout}></Profile>
 			
-			<div class="calendars">
-				{#if userData}
-					{#each userData.calendars as calendarId}
-						<Calendar userId={user.uid} {calendarId}></Calendar>
-					{/each}
-				{/if}
-		
+			<div class="mobile-container">
 				<AddCalendar uid={user.uid}/>
+				<div class="calendars center-vh">
+					{#if userData}
+						{#each userData.calendars as calendarId}
+							<Calendar userId={user.uid} {calendarId}></Calendar>
+						{/each}
+					{/if}
+			
+				</div>
 			</div>
 		</div>
 	{:else}
 		<div class="center-vh">
-			<div class="auth-container center-vh-flex">
+			<div class="auth-container center-vh">
 				<div style="position: relative">
 					<span class="main-logo noselect">
 						DoIt!
@@ -82,7 +84,7 @@
 					DoIt is a Web Application which allows you to track your everyday progress on one task and fill up a calendar doing regular small tasks each day.
 				</div>
 				<Login click={login} />
-				<span class="version noselect">0.0.007</span>
+				<span class="version noselect">0.0.009</span>
 			</div>
 		</div>
 	{/if}
@@ -104,6 +106,11 @@
             background-color: $mdc-theme-background;
             cursor: pointer;
         }
+	}
+
+	.mobile-container {
+		height: 100%;
+		width: clamp(10em, 100%, 20em);
 	}
 
 	.auth-container {

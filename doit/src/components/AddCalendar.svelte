@@ -2,26 +2,50 @@
     import { db } from "../ts/firebase";
     import firebase from 'firebase/app';
 
+    import IconButton from '@smui/icon-button';
+    
+    import PlusCircle from 'svelte-material-icons/PlusCircle.svelte';
+    import Tooltip, { Wrapper } from '@smui/tooltip';
+
+    import Swal from 'sweetalert2';
+
     export let uid: string;
     
     function addCalendar() {
-        let name = prompt("Name of the calendar: ");
-        db.collection('calendars').add({
-            uid,
-            data: [0],
-            name,
-            start_date: firebase.firestore.Timestamp.fromDate(new Date())
-        }).then((reference) => {
-            db.collection('users').doc(uid).update({
-                calendars: firebase.firestore.FieldValue.arrayUnion(reference.id)
-            });
+        Swal.fire({
+            title: 'New Calendar',
+            text: 'Enter the name of the new calendar:',
+            input: 'text',
+            showCancelButton: true,
+            confirmButtonText: 'Create',
+        }).then((inputValue) => {
+            if (inputValue.isConfirmed) {
+                // create a calendar
+                let name = inputValue.value;
+                let currentDate = new Date();
+                currentDate.setHours(0, 0, 0, 0);
+                db.collection('calendars').add({
+                    uid,
+                    data: [0],
+                    name,
+                    start_date: firebase.firestore.Timestamp.fromDate(currentDate)
+                }).then((reference) => {
+                    db.collection('users').doc(uid).update({
+                        calendars: firebase.firestore.FieldValue.arrayUnion(reference.id)
+                    });
+                });
+            }
         });
     }
 </script>
 
-<div class="add-calendar-btn" on:click={addCalendar}>
-    Add new Calendar
-</div>
+<Wrapper>
+    <span class="add-circle-container" on:click={addCalendar}>Add</span>
+    <!-- <IconButton class="material-icons" on:click={addCalendar}>
+        <PlusCircle/>
+    </IconButton> -->
+    <!-- <Tooltip>Add a calendar</Tooltip> -->
+</Wrapper>
 
 <style lang="scss">
     @import './../theme/smui-theme.scss';
@@ -36,5 +60,9 @@
             background-color: $mdc-theme-background;
             cursor: pointer;
         }
+    }
+
+    .add-circle-container {
+        padding: 1em;
     }
 </style>
