@@ -8,3 +8,8 @@ Web application which allows you to track your progress each day on repetitive t
  - [Svelte](https://svelte.dev/) - The Fastest Frontend in the West
  - [MaterialUI](https://sveltematerialui.com/) - The design look of the century
  - [SASS](https://sass-lang.com/) - CSS with Superpowers
+
+
+### Notes for developers
+
+For some reason updating PostCSS to the newest v8.2.15 doesn't extract SCSS for the main CSS bundle. The version which works well is v8.1.0.

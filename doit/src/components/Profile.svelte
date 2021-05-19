@@ -12,7 +12,7 @@
 
 <div class="profile-container">
     <div class="profile-img-container" on:click={toggleMenu}>
-        <img src={user.photoURL} class="profile-img" alt="Profile Image">
+        <img src={user.photoURL} class="profile-img" alt="Profile">
     </div>
     {#if menuVisible}
         <div class="profile-quick-menu">

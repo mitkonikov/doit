@@ -1,5 +1,6 @@
 <script lang="ts">
     import firebase from 'firebase/app';
+    import Swal from 'sweetalert2';
     import { getDaysInMonth } from '../ts/calendar';
     import type { Calendar, Day } from '../ts/types';
 	import { db } from './../ts/firebase';
@@ -56,6 +57,7 @@
                             let currentMonthName = currentDate.toDateString().split(' ')[1];
                             if (currentMonthName != prevMonthName) {
                                 monthNames.push(currentMonthName);
+                                prevMonthName = currentMonthName;
                             } else {
                                 monthNames.push("");
                             }
@@ -87,9 +89,21 @@
     }
 
     function deleteCalendar() {
-        db.collection('calendars').doc(calendarId).delete();
-        db.collection('users').doc(userId).update({
-            calendars: firebase.firestore.FieldValue.arrayRemove(calendarId)
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((inputValue) => {
+            if (inputValue.isConfirmed) {
+                db.collection('calendars').doc(calendarId).delete();
+                db.collection('users').doc(userId).update({
+                    calendars: firebase.firestore.FieldValue.arrayRemove(calendarId)
+                });
+            }
         });
     }
 </script>
@@ -125,7 +139,7 @@
 </div>
 
 <style lang="scss">
-	@import './../theme/smui-theme.scss';
+	@import './../theme/_smui-theme.scss';
     @import './../theme/tooltip.scss';
 
     .calendar-container {

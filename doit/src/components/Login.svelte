@@ -12,7 +12,7 @@
 </div>
 
 <style lang="scss">
-    @import './../theme/smui-theme.scss';
+    @import './../theme/_smui-theme.scss';
 
     .login-center {
         display: flex;

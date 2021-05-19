@@ -2,10 +2,9 @@
     import { db } from "../ts/firebase";
     import firebase from 'firebase/app';
 
-    import IconButton from '@smui/icon-button';
+    import IconButton from '@smui/icon-button/styled';
     
     import PlusCircle from 'svelte-material-icons/PlusCircle.svelte';
-    import Tooltip, { Wrapper } from '@smui/tooltip';
 
     import Swal from 'sweetalert2';
 
@@ -39,30 +38,24 @@
     }
 </script>
 
-<Wrapper>
-    <span class="add-circle-container" on:click={addCalendar}>Add</span>
-    <!-- <IconButton class="material-icons" on:click={addCalendar}>
+<div class="add-calendar">
+    <IconButton on:click={addCalendar}>
         <PlusCircle/>
-    </IconButton> -->
-    <!-- <Tooltip>Add a calendar</Tooltip> -->
-</Wrapper>
+    </IconButton>
+    <span class="add-calendar-info">Add a calender</span>
+</div>
 
 <style lang="scss">
-    @import './../theme/smui-theme.scss';
-
-    .add-calendar-btn {
-        display: inline-block;
-        margin: 0.5em;
-        padding: 1em;
-        border: 0.08em #fff solid;
-
-        &:hover {
-            background-color: $mdc-theme-background;
-            cursor: pointer;
-        }
+    .add-calendar {
+        margin-top: 1em;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
-
-    .add-circle-container {
-        padding: 1em;
+    
+    .add-calendar-info {
+        font-size: 0.9em;
+        margin-left: 0.4em;
     }
 </style>

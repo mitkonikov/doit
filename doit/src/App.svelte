@@ -1,6 +1,4 @@
 <script lang="ts">
-	import './theme/common.scss';
-
 	import { auth, db, googleProvider } from './ts/firebase';
     import { authState } from 'rxfire/auth';
 
@@ -93,7 +91,8 @@
 </main>
 
 <style lang="scss">
-	@import './theme/smui-theme.scss';
+	@import './theme/common.scss';
+	@import './theme/_smui-theme.scss';
 
 	.special-btn {
 		font-family: 'Roboto Light';
