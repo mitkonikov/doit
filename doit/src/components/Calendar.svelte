@@ -13,6 +13,8 @@
     let days: Day[] = [];
     let loaded = false;
     let monthNames: string[] = [];
+    let streak = 0;
+    let settingsValues;
     
     function getData() {
         days = [];
@@ -80,6 +82,14 @@
         if (day.tooltip == currentDate) {
             let mask = 1 << day.day;
             calendarDataSave[day.month] ^= mask;
+            if (calendarDataSave[day.month]) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Congrats!',
+                    text: 'Have a nice day!',
+                });
+            }
+
             db.collection('calendars').doc(calendarId).update({
                 data: calendarDataSave
             });
@@ -106,40 +116,60 @@
             }
         });
     }
+
+    async function showSettings() {
+        settingsValues = await Swal.fire({
+            title: 'Settings',
+            html:
+                '<input id="swal-rename-input" class="swal2-input" value="' + calendarData.name + '">' +
+                '<div id="swal-rename-button" class="swal2-btn">Rename</div>' + '<div id="swal-delete-button" class="swal2-btn">Delete Calendar</div>',
+            focusConfirm: false,
+            preConfirm: () => {
+                return [
+                    document.getElementById('swal-rename-input').value
+                ]
+            }
+        });
+
+        console.log(settingsValues);
+    }
 </script>
 
 <div class="calendar-container">
     <div class="calendar-main">
         {#if typeof calendarData != "undefined"}
             <span class="calendar-name">{calendarData.name}</span>
-            <span class="delete-btn" on:click={deleteCalendar}>Delete</span>
+            {#if streak > 0}
+                <span class="noselect streak">🔥 {streak}</span>
+            {/if}
+            <span class="settings-btn" on:click={() => showSettings()}>Settings</span>
+            <div class="separator"></div>
             {#if loaded}
-                <div class="calendar-months">
-                    {#each monthNames as name}
-                        <div class="calendar-month">{name}</div>
-                    {/each}
+                <div class="calendar-checkbox-container">
+                    <div class="calendar-months">
+                        {#each monthNames as name}
+                            <div class="calendar-month">{name}</div>
+                        {/each}
+                    </div>
+                    <div class="calendar-checkboxes">
+                        {#each days as day, i}
+                            <div 
+                                class="calendar-day tooltipped 
+                                {day.checked ? "checked" : ""}"
+                                data-tooltip={day.tooltip}
+                                on:click={() => checkDay(day)}
+                            ></div>
+                        {/each}
+                    </div>
                 </div>
             {/if}
         {/if}
-        <div class="calendar-checkboxes">
-            {#if !loaded}
-                Loading...
-            {:else}
-                {#each days as day, i}
-                    <div 
-                        class="calendar-day tooltipped 
-                        {day.checked ? "checked" : ""}"
-                        data-tooltip={day.tooltip}
-                        on:click={() => checkDay(day)}
-                    ></div>
-                {/each}
-            {/if}
-        </div>
     </div>
 </div>
 
 <style lang="scss">
 	@import './../theme/_smui-theme.scss';
+    @import './../theme/common.scss';
     @import './../theme/tooltip.scss';
 
     .calendar-container {
@@ -149,6 +179,7 @@
     }
 
     .calendar-main {
+        position: relative;
         color: #fff;
         padding: 1em;
         font-weight: 300;
@@ -156,6 +187,17 @@
 
     .calendar-name {
         font-weight: 400;
+    }
+
+    .calendar-checkbox-container {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: flex-end;
+        flex-direction: column;
+        margin-top: 0.6em;
     }
 
     .calendar-checkboxes, .calendar-months {
@@ -197,7 +239,14 @@
         }
     }
 
-    .delete-btn {
+    .streak {
+        margin-left: 2em;
+        color: rgb(255, 102, 0);
+        font-weight: 700;
+    }
+
+    .settings-btn {
+        position: absolute;
         cursor: pointer;
         font-weight: 300;
         right: 1em;
@@ -205,9 +254,11 @@
         font-size: 0.8em;
         padding: 0.5em;
         border-radius: 0.2em;
+        top: 0.4em;
 
         &:hover {
-            background-color: rgba(255, 0, 0, 0.4);
+            background-color: rgba(0, 255, 0, 0.4);
         }
     }
+
 </style>

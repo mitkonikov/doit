@@ -27,3 +27,10 @@
               user-select: none; /* Non-prefixed version, currently
                                     supported by Chrome and Opera */
 }
+
+.separator {
+    margin-top: 0.6em;
+    width: 100%;
+    height: 1px;
+    background-color: hsla(0, 0%, 100%, 0.1);
+}

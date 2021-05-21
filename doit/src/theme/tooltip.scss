@@ -1,6 +1,5 @@
 .tooltipped {
 	position: relative;
-	z-index: 2;
 	display: block;
 }
 
@@ -9,7 +8,8 @@
 	visibility: hidden;
 	opacity: 0;
 	pointer-events: none;
-	transform: translate(-50%, 5px)
+	transform: translate(-50%, 5px);
+	z-index: 100000;
 }
 
 .tooltipped:before {

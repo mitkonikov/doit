@@ -8,6 +8,7 @@
 	import Profile from './components/Profile.svelte';
 	import Login from './components/Login.svelte';
 	import type { User } from './ts/types';
+	import { LottiePlayer } from '@lottiefiles/svelte-lottie-player';
 
 	let user: firebase.User;
 	let userData: User;
@@ -58,8 +59,8 @@
 			<Profile {user} {logout}></Profile>
 			
 			<div class="mobile-container">
-				<AddCalendar uid={user.uid}/>
 				<div class="calendars center-vh">
+					<AddCalendar uid={user.uid}/>
 					{#if userData}
 						{#each userData.calendars as calendarId}
 							<Calendar userId={user.uid} {calendarId}></Calendar>
@@ -81,8 +82,18 @@
 				<div class="intro noselect">
 					DoIt is a Web Application which allows you to track your everyday progress on one task and fill up a calendar doing regular small tasks each day.
 				</div>
+				<div>
+					<LottiePlayer
+						src="./animations/intro"
+						autoplay="{true}"
+						loop="{true}"
+						controls="{false}"
+						renderer="svg"
+						background="transparent"
+					/>
+				</div>
 				<Login click={login} />
-				<span class="version noselect">0.0.009</span>
+				<span class="version noselect">0.0.010</span>
 			</div>
 		</div>
 	{/if}
@@ -109,7 +120,7 @@
 
 	.mobile-container {
 		height: 100%;
-		width: clamp(10em, 100%, 20em);
+		width: clamp(10em, 100%, 27em);
 	}
 
 	.auth-container {

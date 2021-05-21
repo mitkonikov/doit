@@ -1,0 +1,27 @@
+#swal-delete-button {
+    background-color: rgba(255, 0, 0, 0.74);
+    color: rgba(255, 255, 255, 1);
+    padding: 0.3em 0.6em;
+    font-weight: 300;
+    border: 1px solid rgb(255 0 0);
+}
+
+#swal-delete-button:hover {
+    background-color: rgba(255, 0, 0, 0.85);
+}
+
+.swal2-btn {
+    display: inline-block;
+    border: 1px solid rgb(176 176 203);
+    border-radius: 0.6em;
+    padding: 0.3em 0.6em;
+    font-weight: 600;
+    color: rgb(61 61 134);
+    background-color: rgba(0, 0, 0, 0.04);
+    margin: 0.2em 0.2em;
+}
+
+.swal2-btn:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+}
