@@ -58,8 +58,8 @@
 		<div class="center-vh">
 			<Profile {user} {logout}></Profile>
 			
-			<div class="mobile-container">
-				<div class="calendars center-vh">
+			<div class="mobile-container center-vh">
+				<div class="calendars custom-scroll">
 					<AddCalendar uid={user.uid}/>
 					{#if userData}
 						{#each userData.calendars as calendarId}
@@ -93,7 +93,7 @@
 					/>
 				</div>
 				<Login click={login} />
-				<span class="version noselect">0.0.010</span>
+				<span class="version noselect">0.0.011</span>
 			</div>
 		</div>
 	{/if}
@@ -121,6 +121,13 @@
 	.mobile-container {
 		height: 100%;
 		width: clamp(10em, 100%, 27em);
+	}
+
+	.calendars {
+		width: 100%;
+		max-height: 100%;
+		overflow-x: hidden;
+    	overflow-y: auto;
 	}
 
 	.auth-container {

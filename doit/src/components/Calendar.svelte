@@ -1,7 +1,7 @@
 <script lang="ts">
     import firebase from 'firebase/app';
     import Swal from 'sweetalert2';
-    import { getDaysInMonth } from '../ts/calendar';
+    import { dayDiff, getDaysInMonth } from '../ts/calendar';
     import type { Calendar, Day } from '../ts/types';
 	import { db } from './../ts/firebase';
 
@@ -28,14 +28,7 @@
                 calendarDataSave = [...calendarData.data];
 
                 let calendarStartDate = calendarData.start_date.toDate();
-                let nowDate = new Date();
-
-                const one_day = 1000 * 60 * 60 * 24;
-    
-                if (nowDate.getMonth() == 11 && calendarStartDate.getDate() > 25)
-                    nowDate.setFullYear(nowDate.getFullYear() + 1);
-                
-                let dayDiff = Math.floor(Math.round(nowDate.getTime() - calendarStartDate.getTime()) / (one_day)) + 1;
+                let diff = dayDiff(calendarStartDate);
 
                 // Decode the data from the db
                 let countDays = 0;
@@ -46,11 +39,18 @@
                     let daysInMonth = getDaysInMonth(currentDate.getMonth(), currentDate.getFullYear());
 
                     for (let day = 0; day < daysInMonth; day++) {
+                        let isChecked = Boolean(calendarData.data[month] & 1);
                         days.push({
-                            checked: Boolean(calendarData.data[month] & 1),
+                            checked: isChecked,
                             tooltip: currentDate.toDateString(),
                             month, day
                         });
+
+                        if (isChecked) {
+                            streak++;
+                        } else {
+                            streak = 0;
+                        }
 
                         currentDate.setDate(currentDate.getDate() + 1);
 
@@ -65,7 +65,7 @@
                             }
                         }
                         
-                        if (countDays == dayDiff - 1) break;
+                        if (countDays == diff - 1) break;
                         countDays++;
                     }
                 }
@@ -117,6 +117,14 @@
         });
     }
 
+    function renameCalendar(newName: string) {
+        db.collection('calendars').doc(calendarId).update({
+            name: document.getElementById('swal-rename-input').value
+        }).then(() => {
+            getData();
+        });
+    }
+
     async function showSettings() {
         settingsValues = await Swal.fire({
             title: 'Settings',
@@ -124,14 +132,16 @@
                 '<input id="swal-rename-input" class="swal2-input" value="' + calendarData.name + '">' +
                 '<div id="swal-rename-button" class="swal2-btn">Rename</div>' + '<div id="swal-delete-button" class="swal2-btn">Delete Calendar</div>',
             focusConfirm: false,
+            didOpen: () => {
+                document.getElementById('swal-rename-button').onclick = renameCalendar;
+                document.getElementById('swal-delete-button').onclick = deleteCalendar;
+            },
             preConfirm: () => {
                 return [
                     document.getElementById('swal-rename-input').value
                 ]
             }
         });
-
-        console.log(settingsValues);
     }
 </script>
 
@@ -173,7 +183,7 @@
     @import './../theme/tooltip.scss';
 
     .calendar-container {
-        width: 100%;
+        width: calc(100% - 1em);
         background-color: rgba(0, 0, 0, 0.2);
         margin: 0.5em;
     }

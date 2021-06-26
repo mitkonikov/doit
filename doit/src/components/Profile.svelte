@@ -24,6 +24,7 @@
 <style lang="scss">
     .profile-container {
         cursor: pointer;
+        z-index: 10000;
     }
 
     .profile-img-container {
