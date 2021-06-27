@@ -6,7 +6,7 @@
     
     import PlusCircle from 'svelte-material-icons/PlusCircle.svelte';
 
-    import Swal from 'sweetalert2';
+    import Swal from 'sweetalert2/src/sweetalert2.js'
 
     export let uid: string;
     

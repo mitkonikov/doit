@@ -93,7 +93,7 @@
 					/>
 				</div>
 				<Login click={login} />
-				<span class="version noselect">0.0.011</span>
+				<span class="version noselect">0.0.012</span>
 			</div>
 		</div>
 	{/if}

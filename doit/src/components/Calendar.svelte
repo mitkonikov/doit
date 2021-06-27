@@ -1,6 +1,6 @@
 <script lang="ts">
     import firebase from 'firebase/app';
-    import Swal from 'sweetalert2';
+    import Swal from 'sweetalert2/src/sweetalert2.js'
     import { dayDiff, getDaysInMonth } from '../ts/calendar';
     import type { Calendar, Day } from '../ts/types';
 	import { db } from './../ts/firebase';
