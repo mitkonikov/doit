@@ -82,7 +82,7 @@
         if (day.tooltip == currentDate) {
             let mask = 1 << day.day;
             calendarDataSave[day.month] ^= mask;
-            if (calendarDataSave[day.month]) {
+            if ((calendarDataSave[day.month] & mask) > 0) {
                 Swal.fire({
                     icon: 'success',
                     title: 'Congrats!',
@@ -92,9 +92,7 @@
 
             db.collection('calendars').doc(calendarId).update({
                 data: calendarDataSave
-            });
-
-            getData();
+            }).then(() => getData());
         }
     }
 
@@ -112,12 +110,12 @@
                 db.collection('calendars').doc(calendarId).delete();
                 db.collection('users').doc(userId).update({
                     calendars: firebase.firestore.FieldValue.arrayRemove(calendarId)
-                });
+                }).then(getData);
             }
         });
     }
 
-    function renameCalendar(newName: string) {
+    function renameCalendar() {
         db.collection('calendars').doc(calendarId).update({
             name: document.getElementById('swal-rename-input').value
         }).then(() => {
@@ -156,20 +154,22 @@
             <div class="separator"></div>
             {#if loaded}
                 <div class="calendar-checkbox-container">
-                    <div class="calendar-months">
-                        {#each monthNames as name}
-                            <div class="calendar-month">{name}</div>
-                        {/each}
-                    </div>
-                    <div class="calendar-checkboxes">
-                        {#each days as day, i}
-                            <div 
-                                class="calendar-day tooltipped 
-                                {day.checked ? "checked" : ""}"
-                                data-tooltip={day.tooltip}
-                                on:click={() => checkDay(day)}
-                            ></div>
-                        {/each}
+                    <div class="calendar-scroll-wrapper custom-scroll">
+                        <div class="calendar-months">
+                            {#each monthNames as name}
+                                <div class="calendar-month">{name}</div>
+                            {/each}
+                        </div>
+                        <div class="calendar-checkboxes">
+                            {#each days as day, i}
+                                <div 
+                                    class="calendar-day tooltipped 
+                                    {day.checked ? "checked" : ""}"
+                                    data-tooltip={day.tooltip}
+                                    on:click={() => checkDay(day)}
+                                ></div>
+                            {/each}
+                        </div>
                     </div>
                 </div>
             {/if}
@@ -223,6 +223,18 @@
 
     .calendar-months {
         grid-template-rows: repeat(1, 1fr);
+        padding-right: 0.8em;
+    }
+
+    .calendar-scroll-wrapper {
+        width: 100%;
+        height: 100%;
+        overflow-x: auto;
+        padding-bottom: 0.3em;
+    }
+
+    .calendar-scroll-wrapper::-webkit-scrollbar {
+        height: 0.3em;
     }
 
     .calendar-month {

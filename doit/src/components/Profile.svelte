@@ -33,6 +33,8 @@
         right: 1em;
         padding: 0.3em;
         border-radius: 0.3em;
+        width: 56px;
+        height: 56px;
     
         &:hover {
             background-color: rgba(0, 0, 0, 0.2);
@@ -49,8 +51,8 @@
     }
 
     .profile-img {
-        height: 3.5em;
-        width: 3.5em;
+        width: 56px;
+        height: 56px;
         border-radius: 0.3em;
     }
 </style>

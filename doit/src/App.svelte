@@ -93,7 +93,7 @@
 					/>
 				</div>
 				<Login click={login} />
-				<span class="version noselect">0.0.012</span>
+				<span class="version noselect">0.0.013</span>
 			</div>
 		</div>
 	{/if}
@@ -128,6 +128,12 @@
 		max-height: 100%;
 		overflow-x: hidden;
     	overflow-y: auto;
+	}
+
+	@media only screen and (max-width: 600px) {
+		.calendars {
+			padding-top: 5em;
+		}
 	}
 
 	.auth-container {
