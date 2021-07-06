@@ -23,3 +23,37 @@
     background-color: rgba(0, 0, 0, 0.1);
     cursor: pointer;
 }
+
+.swal-collapse-switch {
+    display: flex;
+    margin: 0.3em;
+    color: #fff;
+    cursor: pointer;
+    justify-content: center;
+    align-items: center;
+}
+
+.swal-switch {
+    position: relative;
+    display: inline-block;
+    width: 2.6em;
+    height: 1.3em;
+    background-color: #fff;
+    margin-right: 0.5em;
+    border-radius: 0.3em;
+}
+
+.swal-switch-toggle {
+    position: absolute;
+    width: 1.3em;
+    height: 1.3em;
+    background-color: #0d1f29b4;
+    left: 0;
+    transition: all 0.15s cubic-bezier(0.83, 0, 0.17, 1);
+    border-radius: 0.3em;
+}
+
+.swal-switch-toggle-checked {
+    left: 1.3em;
+    background-color: #1db92a;
+}

@@ -96,8 +96,12 @@
 						background="transparent"
 					/>
 				</div>
+				<div class="intro quote noselect">
+					Success doesn't come from what you do occasionally, it comes from what you do consistently.
+					<div class="quote-author"> - Marie Forleo. </div>
+				</div>
 				<Login click={login} />
-				<span class="version noselect">0.0.013</span>
+				<span class="version noselect">0.0.014</span>
 			</div>
 		</div>
 	{/if}
@@ -163,6 +167,20 @@
 		font-weight: 300;
 		padding: 1em 1.5em;
 		width: 100%;
+	}
+
+	.quote {
+		.quote-author {
+			float: right;
+			margin-top: 0.3em;
+			font-weight: 400;
+		}
+	}
+
+	@media only screen and (max-height: 640px) {
+		.quote {
+			display: none;
+		}
 	}
 
 	.version {

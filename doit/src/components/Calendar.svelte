@@ -26,6 +26,7 @@
             calendarQuery.then((result) => {
                 calendarData = result.data() as any;
                 calendarDataSave = [...calendarData.data];
+                let tempData = [...calendarData.data];
 
                 let calendarStartDate = calendarData.start_date.toDate();
                 let diff = dayDiff(calendarStartDate);
@@ -33,13 +34,13 @@
                 // Decode the data from the db
                 let countDays = 0;
                 let prevMonthName = "";
-                for (let month = 0; month < calendarData.data.length; month++) {
+                for (let month = 0; month < tempData.length; month++) {
                     let currentDate = new Date(calendarStartDate);
                     currentDate.setMonth(currentDate.getMonth() + month);
                     let daysInMonth = getDaysInMonth(currentDate.getMonth(), currentDate.getFullYear());
 
                     for (let day = 0; day < daysInMonth; day++) {
-                        let isChecked = Boolean(calendarData.data[month] & 1);
+                        let isChecked = Boolean(tempData[month] & 1);
                         days.push({
                             checked: isChecked,
                             tooltip: currentDate.toDateString(),
@@ -54,7 +55,7 @@
 
                         currentDate.setDate(currentDate.getDate() + 1);
 
-                        calendarData.data[month] = calendarData.data[month] >> 1;
+                        tempData[month] = tempData[month] >> 1;
                         if (countDays % 7 == 0) {
                             let currentMonthName = currentDate.toDateString().split(' ')[1];
                             if (currentMonthName != prevMonthName) {
@@ -81,8 +82,8 @@
         let currentDate = new Date().toDateString();
         if (day.tooltip == currentDate) {
             let mask = 1 << day.day;
-            calendarDataSave[day.month] ^= mask;
-            if ((calendarDataSave[day.month] & mask) > 0) {
+            calendarData.data[day.month] ^= mask;
+            if ((calendarData.data[day.month] & mask) > 0) {
                 Swal.fire({
                     icon: 'success',
                     title: 'Congrats!',
@@ -90,9 +91,7 @@
                 });
             }
 
-            db.collection('calendars').doc(calendarId).update({
-                data: calendarDataSave
-            }).then(() => getData());
+            updateCalendarData();
         }
     }
 
@@ -123,16 +122,46 @@
         });
     }
 
-    async function showSettings() {
+    const collapseSwitchId = "swal-collapse-switch-toggle";
+    function updateShowCollapsedToggle(): void {
+        if (calendarData.show_collapsed) {
+            document.getElementById(collapseSwitchId).classList.add("swal-switch-toggle-checked");
+        } else {
+            document.getElementById(collapseSwitchId).classList.remove("swal-switch-toggle-checked");
+        }
+    }
+
+    function isCollapsed(): Boolean {
+        if (typeof calendarData.show_collapsed == "undefined") return false;
+        return calendarData.show_collapsed;
+    }
+
+    async function updateCalendarData(): Promise<void> {
+        await db.collection("calendars").doc(calendarId).update(calendarData);
+        getData();
+    }
+
+    async function showSettings(): Promise<void> {
         settingsValues = await Swal.fire({
             title: 'Settings',
             html:
-                '<input id="swal-rename-input" class="swal2-input" value="' + calendarData.name + '">' +
-                '<div id="swal-rename-button" class="swal2-btn">Rename</div>' + '<div id="swal-delete-button" class="swal2-btn">Delete Calendar</div>',
+                'Name: <input id="swal-rename-input" class="swal2-input" value="' + calendarData.name + '">' +
+                '<div id="swal-rename-button" class="swal2-btn">Rename</div>' + '<div id="swal-delete-button" class="swal2-btn">Delete Calendar</div>' +
+                '<div class="swal-collapse-switch" id="swal-collapse-switch"><div class="swal-switch"><div class="swal-switch-toggle" id="swal-collapse-switch-toggle"></div></div>Show collapsed</div>',
             focusConfirm: false,
             didOpen: () => {
+                updateShowCollapsedToggle();
                 document.getElementById('swal-rename-button').onclick = renameCalendar;
                 document.getElementById('swal-delete-button').onclick = deleteCalendar;
+                document.getElementById('swal-collapse-switch').onclick = () => {
+                    if (typeof calendarData.show_collapsed == "undefined") {
+                        calendarData.show_collapsed = false;
+                    }
+                    
+                    calendarData.show_collapsed = !calendarData.show_collapsed;
+                    updateShowCollapsedToggle();
+                    updateCalendarData();
+                };
             },
             preConfirm: () => {
                 return [
@@ -155,12 +184,14 @@
             {#if loaded}
                 <div class="calendar-checkbox-container">
                     <div class="calendar-scroll-wrapper custom-scroll">
-                        <div class="calendar-months">
-                            {#each monthNames as name}
-                                <div class="calendar-month">{name}</div>
-                            {/each}
-                        </div>
-                        <div class="calendar-checkboxes">
+                        {#if !isCollapsed()}
+                            <div class="calendar-months">
+                                {#each monthNames as name}
+                                    <div class="calendar-month">{name}</div>
+                                {/each}
+                            </div>
+                        {/if}
+                        <div class="calendar-checkboxes {isCollapsed() ? "collapsed": ""}">
                             {#each days as day, i}
                                 <div 
                                     class="calendar-day tooltipped 
@@ -181,91 +212,7 @@
 	@import './../theme/_smui-theme.scss';
     @import './../theme/common.scss';
     @import './../theme/tooltip.scss';
-
-    .calendar-container {
-        width: calc(100% - 1em);
-        background-color: rgba(0, 0, 0, 0.2);
-        margin: 0.5em;
-    }
-
-    .calendar-main {
-        position: relative;
-        color: #fff;
-        padding: 1em;
-        font-weight: 300;
-    }
-
-    .calendar-name {
-        font-weight: 400;
-    }
-
-    .calendar-checkbox-container {
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
-        display: flex;
-        justify-content: center;
-        align-items: flex-end;
-        flex-direction: column;
-        margin-top: 0.6em;
-    }
-
-    .calendar-checkboxes, .calendar-months {
-        position: relative;
-        display: grid;
-        grid-auto-flow: column;
-        grid-template-rows: repeat(7, 1fr);
-        row-gap: 0.3em;
-        column-gap: 0.3em;
-        width: fit-content;
-        margin-top: 0.4em;
-    }
-
-    .calendar-months {
-        grid-template-rows: repeat(1, 1fr);
-        padding-right: 0.8em;
-    }
-
-    .calendar-scroll-wrapper {
-        width: 100%;
-        height: 100%;
-        overflow-x: auto;
-        padding-bottom: 0.3em;
-    }
-
-    .calendar-scroll-wrapper::-webkit-scrollbar {
-        height: 0.3em;
-    }
-
-    .calendar-month {
-        width: 1em;
-        height: 1em;
-    }
-
-    .calendar-day {
-        background-color: $unchecked-color;
-        border-radius: 0.1em;
-        width: 1em;
-        height: 1em;
-
-        &.checked {
-            background-color: $checked-color;
-            
-            &:hover {
-                background-color: darken($checked-color, 10%);
-            }
-        }
-
-        &:hover {
-            background-color: darken($unchecked-color, 10%);
-        }
-    }
-
-    .streak {
-        margin-left: 2em;
-        color: rgb(255, 102, 0);
-        font-weight: 700;
-    }
+    @import './../scss/Calendar.scss';
 
     .settings-btn {
         position: absolute;
@@ -277,6 +224,7 @@
         padding: 0.5em;
         border-radius: 0.2em;
         top: 0.4em;
+        background-color: rgba(0, 255, 0, 0.082);
 
         &:hover {
             background-color: rgba(0, 255, 0, 0.4);
